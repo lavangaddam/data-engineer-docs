@@ -1,17 +1,19 @@
-
-
 from pathlib import Path
+import os
 
 import pandas as pd
 from sqlalchemy import create_engine, text
 
-# Use the project root as the current working directory
-BASE_DIR = Path.cwd()
+BASE_DIR = Path(__file__).resolve().parents[3]
 INPUT_FILE = BASE_DIR / "data" / "processed" / "orders_transformed.csv"
 
-DATABASE_URL = (
-    "postgresql+psycopg2://lavankumatgaddam@localhost:5432/olist_db"
-)
+DATABASE_URL = os.getenv("DATABASE_URL")
+
+if not DATABASE_URL:
+    raise ValueError(
+        "DATABASE_URL is not set. "
+        "Configure your PostgreSQL connection first."
+    )
 
 if not INPUT_FILE.exists():
     raise FileNotFoundError(f"CSV file not found: {INPUT_FILE}")
@@ -38,13 +40,4 @@ try:
     print(f"Successfully loaded {count} rows into PostgreSQL!")
 
 finally:
-    engine.dispose() 
-SELECT
-    order_status,
-    COUNT(*) AS total_orders 
-SELECT
-    order_status,
-    COUNT(*) AS total_orders
-FROM orders
-GROUP BY order_status
-ORDER BY total_orders DESC;
+    engine.dispose()
